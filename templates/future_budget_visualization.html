@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>월별 예산 시각화</title>
+    <style>
+        img {
+            display: block;
+            margin: 20px auto;
+            width: 80%;
+            max-width: 800px;
+        }
+    </style>
+</head>
+<body>
+    <h1>월별 예산 시각화</h1>
+    {% if img_path %}
+        <img src="{{ img_path }}" alt="월별 예산과 지출 시각화">
+    {% else %}
+        <p>데이터가 없습니다.</p>
+    {% endif %}
+</body>
+</html>

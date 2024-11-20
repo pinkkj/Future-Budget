@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MBTI Page</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            margin-top: 50px;
+        }
+        img {
+            width: 300px;
+            height: auto;
+            margin-top: 20px;
+        }
+    </style>
+</head>
+<body>
+    <h1>당신의 소비유형 mbti는?</h1>
+    <p id="category-description"></p>
+    <img id="category-image" src="" alt="카테고리 이미지">
+
+    <script>
+        // Python에서 전달된 데이터 (예: Flask로 렌더링 시 넘겨줌)
+        const topCategory = "{{ top_category }}"; // 가장 높은 비율의 카테고리
+
+        // 카테고리별 이미지 맵핑
+        const categoryImages = {
+            "식비": "/static/images/food.jpg",
+            "카페, 간식": "/static/images/cafe.jpg",
+            "편의점, 마트": "/static/mages/store.jpg",
+            "술, 유흥": "/static/images/drink.jpg",
+            "생활, 쇼핑": "/static/images/shopping.jpg",
+            "패션, 뷰티": "/static/images/fashion.jpg",
+            "취미, 여가, 운동": "/static/images/hobby.jpg",
+            "의료": "/static/images/medical.jpg",
+            "주거, 통신": "/static/images/housing.jpg",
+            "교통, 자동차": "/static/images/transport.jpg",
+            "여행, 숙박": "/static/images/travel.jpg",
+            "교육": "/static/images/education.jpg"
+        };
+
+        // HTML에 데이터 반영
+        document.getElementById("category-description").innerText = `가장 높은 비율의 카테고리: ${topCategory}`;
+        document.getElementById("category-image").src = categoryImages[topCategory] || "images/default.jpg";
+    </script>
+</body>
+</html>

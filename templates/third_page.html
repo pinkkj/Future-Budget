@@ -1,0 +1,336 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Step 2 & Step 3</title>
+    <style>
+        @font-face {
+            font-family: 'S-CoreDream-3Light';
+            src: url('https://fastly.jsdelivr.net/gh/projectnoonnu/noonfonts_six@1.2/S-CoreDream-3Light.woff') format('woff');
+            font-weight: normal;
+            font-style: normal;
+        }
+
+        body, html {
+            margin: 0;
+            padding: 0;
+            height: 100%;
+            font-family: 'S-CoreDream-3Light', Arial, sans-serif;
+            display: flex;
+            flex-direction: column;
+            width: 100%;
+            overflow-x: hidden;
+        }
+
+        .logo-container {
+            position: relative;
+            top: 10px;
+            left: 20px;
+            text-align: left;
+            z-index: 10;
+            margin-bottom: 20px;
+            margin-top: 25px;
+        }
+
+        .logo-container img {
+            width: 160px;
+            height: auto;
+            cursor: pointer;
+        }
+
+        .step-title {
+            width: 100%;
+            height: 33.3vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin-bottom: 20px;
+            margin-top: 20px;
+        }
+
+        .step-title img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .budget-input {
+            text-align: center;
+            margin-top: 20px;
+        }
+
+        input[type="number"] {
+            width: 200px;
+            padding: 8px;
+            font-size: 14px;
+            margin-bottom: 20px;
+        }
+
+        label {
+            font-size: 14px;
+            margin-right: 10px;
+        }
+
+        .checkbox-group {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);  /* 3열로 배치 */
+            gap: 10px;  /* 항목 간 간격을 줄이기 */
+            margin-top: 20px;
+            padding: 10px;
+        }
+
+        .category-item {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            margin: 0;
+        }
+
+        .category-item img {
+            width: 80px;
+            height: 80px;
+            object-fit: cover;
+            margin-bottom: 5px;
+        }
+
+        .category-item input {
+            margin-bottom: 5px;
+        }
+
+        .category-item span {
+            font-size: 14px;
+        }
+
+        .button-container {
+            display: flex;
+            justify-content: center;
+            margin-top: 50px;
+            padding: 0 20px;
+            gap: 20px;
+            margin-bottom: 100px;
+        }
+
+        .button-container a, .button-container button {
+            margin-bottom: -20px;
+            background-color: #003366;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            font-size: 16px;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+            text-decoration: none;
+        }
+
+        .button-container a:hover, .button-container button:hover {
+            background-color: #002953;
+        }
+
+        .section5 {
+            grid-row: 5;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            background-color: #424141;
+            color: rgb(185, 185, 185);
+            padding: 20px;
+            height: 22.2vh;
+        }
+
+        .section5 h5, .section5 h7, .section5 p {
+            margin: 10px 0;
+            text-align: center;
+        }
+
+        .section-title {
+            font-size: 20px;
+            text-align: center;
+            margin-bottom: 10px;
+            margin-top: 30px;
+            font-weight: normal;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- 로고 영역 -->
+    <div class="logo-container">
+        <a href="{{ url_for('index') }}" id="logo-link">
+            <img src="/static/images/logo.jpg" alt="로고">
+        </a>
+    </div>
+
+    <!-- Step 2 이미지 삽입 부분 -->
+    <div class="step-title">
+        <img src="/static/images/third_page_cover.jpg" alt="3페이지 커버">
+    </div>
+
+    <!-- 예산 설정 텍스트 -->
+    <div class="section-title">예산 설정</div>
+
+    <!-- 예산 입력 폼 -->
+    <div class="budget-input">
+        <label for="budget">예산 (원):</label>
+        <input type="number" id="budget" name="budget" placeholder="예산을 입력해주세요." required><br>
+    </div>
+
+    <!-- 지출을 줄일 카테고리 설정 텍스트 -->
+    <div class="section-title">지출을 줄일 카테고리 설정 (중복 선택 가능)</div>
+
+    <!-- 체크박스 카테고리 선택 -->
+    <form id="budget-form">
+        <div class="checkbox-group">
+            <!-- 카테고리 1 -->
+            <div class="category-item">
+                <img src="/static/images/식비.jpg" alt="식비">
+                <input type="checkbox" name="category" value="식비">
+                <span>식비</span>
+            </div>
+            <!-- 카테고리 2 -->
+            <div class="category-item">
+                <img src="/static/images/카페, 간식.jpg" alt="카페, 간식">
+                <input type="checkbox" name="category" value="카페, 간식">
+                <span>카페, 간식</span>
+            </div>
+            <!-- 카테고리 3 -->
+            <div class="category-item">
+                <img src="/static/images/편의점, 마트.jpg" alt="편의점, 마트">
+                <input type="checkbox" name="category" value="편의점, 마트">
+                <span>편의점, 마트</span>
+            </div>
+            <!-- 카테고리 4 -->
+            <div class="category-item">
+                <img src="/static/images/술, 유흥.jpg" alt="술, 유흥">
+                <input type="checkbox" name="category" value="술, 유흥">
+                <span>술, 유흥</span>
+            </div>
+            <!-- 카테고리 5 -->
+            <div class="category-item">
+                <img src="/static/images/생활, 쇼핑.jpg" alt="생활, 쇼핑">
+                <input type="checkbox" name="category" value="생활, 쇼핑">
+                <span>생활, 쇼핑</span>
+            </div>
+            <!-- 카테고리 6 -->
+            <div class="category-item">
+                <img src="/static/images/패션, 뷰티.jpg" alt="패션, 뷰티">
+                <input type="checkbox" name="category" value="패션, 뷰티">
+                <span>패션, 뷰티</span>
+            </div>
+            <!-- 카테고리 7 -->
+            <div class="category-item">
+                <img src="/static/images/취미, 여가, 운동.jpg" alt="취미, 여가, 운동">
+                <input type="checkbox" name="category" value="취미, 여가, 운동">
+                <span>취미, 여가, 운동</span>
+            </div>
+            <!-- 카테고리 8 -->
+            <div class="category-item">
+                <img src="/static/images/의료.jpg" alt="의료">
+                <input type="checkbox" name="category" value="의료">
+                <span>의료</span>
+            </div>
+            <!-- 카테고리 9 -->
+            <div class="category-item">
+                <img src="/static/images/주거, 통신.jpg" alt="주거, 통신">
+                <input type="checkbox" name="category" value="주거, 통신">
+                <span>주거, 통신</span>
+            </div>
+            <!-- 카테고리 10 -->
+            <div class="category-item">
+                <img src="/static/images/교통, 자동차.jpg" alt="교통, 자동차">
+                <input type="checkbox" name="category" value="교통, 자동차">
+                <span>교통, 자동차</span>
+            </div>
+            <!-- 카테고리 11 -->
+            <div class="category-item">
+                <img src="/static/images/여행, 숙박.jpg" alt="여행, 숙박">
+                <input type="checkbox" name="category" value="여행, 숙박">
+                <span>여행, 숙박</span>
+            </div>
+        </div>
+    </form>
+
+    <!-- 이전, 다음 버튼 -->
+    <div class="button-container">
+        <a href="{{ url_for('second_page') }}" class="prev-button" id="prev-button">Prev</a>
+        <a href="javascript:void(0)" class="next-button" id="next-button">Next</a>
+    </div>
+
+    <!-- 하단 정보 -->
+    <div class="section5">
+        <h4>경희대학교 데이터 분석/AI 중앙동아리 KHUDA</h4>
+        <h7>Data Buisiness & Recommendation System Track</h7>
+        <p>개발: 소프트웨어융합학과 최소영, 이제희 / 산업경영공학과 허채은, 이준영</p>
+    </div>
+
+    <script>
+        // 로고 클릭 시 확인
+        document.getElementById('logo-link').addEventListener('click', function(event) {
+            const confirmation = window.confirm("메인 페이지로 돌아가시겠습니까?");
+            if (!confirmation) {
+                event.preventDefault();
+            }
+        });
+    
+        // 이전 버튼 클릭 시 확인
+        document.getElementById('prev-button').addEventListener('click', function(event) {
+            const confirmation = window.confirm("이전 페이지로 돌아가시겠습니까?");
+            if (!confirmation) {
+                event.preventDefault();
+            }
+        });
+    
+        // Next 버튼 클릭 시 처리
+        document.getElementById('next-button').addEventListener('click', function(event) {
+            // 예산 입력값 검증
+            const budgetInput = document.getElementById('budget');
+            if (budgetInput.value.trim() === "") {
+                alert("예산을 입력해주세요.");
+                return;  // 예산이 없으면 함수 종료
+            }
+    
+            // 카테고리 선택 여부 확인
+            const selectedCategories = document.querySelectorAll('input[name="category"]:checked');
+            if (selectedCategories.length === 0) {
+                alert("카테고리를 최소 하나 선택해주세요.");
+                return;  // 카테고리가 없으면 함수 종료
+            }
+    
+            // 선택된 카테고리 배열
+            const categories = [];
+            selectedCategories.forEach(function(checkbox) {
+                categories.push(checkbox.value);
+            });
+    
+            // 폼 데이터 구성
+            const formData = new FormData();
+            formData.append('budget', budgetInput.value);
+            formData.append('categories', categories);
+    
+            // 서버에 AJAX로 전송
+            fetch('/third_page', {
+                method: 'POST',
+                body: formData
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.message === 'Budget and categories saved successfully') {
+                    alert("예산과 카테고리가 성공적으로 저장되었습니다.");
+                    window.location.href = "{{ url_for('fourth_page') }}";  // '다음' 페이지로 이동
+                } else {
+                    alert("저장 실패. 다시 시도해주세요.");
+                }
+            })
+            .catch(error => {
+                console.error('서버 요청 실패:', error);
+                alert("서버 요청에 실패했습니다.");
+            });
+        });
+    </script>     
+
+</body>
+</html>
