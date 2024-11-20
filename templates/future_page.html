@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Interactive Calendar - 미래 페이지</title>
+    <style>
+        @font-face {
+            font-family: 'S-CoreDream-3Light';
+            src: url('https://fastly.jsdelivr.net/gh/projectnoonnu/noonfonts_six@1.2/S-CoreDream-3Light.woff') format('woff');
+            font-weight: normal;
+            font-style: normal;
+        }
+        body, html {
+            margin: 0;
+            padding: 0;
+            height: 100%;
+            font-family: 'S-CoreDream-3Light', Arial, sans-serif;
+            display: flex;
+            flex-direction: column;
+            width: 100%;
+            overflow-x: hidden; /* 가로 스크롤을 숨깁니다 */
+        }
+        .calendar-header {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin: 20px;
+        }
+        .calendar-header button {
+            font-size: 20px;
+            margin: 0 10px;
+        }
+        .calendar-header h2 {
+            font-size: 24px;
+        }
+        .calendar {
+            border: 1px solid #ccc;
+            padding: 10px;
+            width: 300px;
+        }
+        .month-name {
+            text-align: center;
+            margin-bottom: 10px;
+            font-weight: bold;
+        }
+        .weekdays, .days {
+            display: flex;
+            flex-wrap: wrap;
+        }
+        .weekdays div, .days div {
+            width: 40px;
+            height: 40px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        .days div {
+            cursor: pointer;
+            border: 1px solid #ddd;
+            margin: 2px;
+        }
+        .days div:hover {
+            background-color: #f0f0f0;
+        }
+        .empty {
+            visibility: hidden;
+        }
+        .future-button {
+            margin-top: 20px;
+            padding: 10px 20px;
+            font-size: 18px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            cursor: pointer;
+            border-radius: 5px;
+        }
+        .future-button:hover {
+            background-color: #45a049;
+        }
+                /* 추가된 부분: 삭제 버튼 스타일 */
+        .delete-button {
+            margin-top: 10px;
+            padding: 10px 20px;
+            font-size: 18px;
+            background-color: #f44336;
+            color: white;
+            border: none;
+            cursor: pointer;
+            border-radius: 5px;
+        }
+        .delete-button:hover {
+            background-color: #d32f2f;
+        }
+    </style>
+</head>
+<body>
+    <h1>Calendar</h1>
+    <div class="calendar-header">
+        <button id="prevYearBtn" onclick="changeYear(-1)">&lt;&lt;</button>
+        <button id="prevMonthBtn" onclick="changeMonth(-1)">&lt;</button>
+        <h2 id="monthYear"></h2>
+        <button id="nextMonthBtn" onclick="changeMonth(1)">&gt;</button>
+        <button id="nextYearBtn" onclick="changeYear(1)">&gt;&gt;</button>
+    </div>
+    <div class="calendar" id="calendarContainer"></div>
+
+    <form method="post" action="/future_budget_visualization">
+        <button type="submit" class="future-button">미래가 궁금하신가요?</button>
+    </form>
+
+        <!-- 가계부 초기화 버튼 -->
+    <form method="post" action="/clear_data" onsubmit="return confirm('정말 데이터를 삭제하시겠습니까?')">
+        <button type="submit" class="delete-button">가계부 초기화</button>
+    </form>
+
+    <script>
+        let currentDate = new Date();
+
+        function renderCalendar(date) {
+            const monthNames = [
+                "1월", "2월", "3월", "4월", "5월", "6월",
+                "7월", "8월", "9월", "10월", "11월", "12월"
+            ];
+            const calendarContainer = document.getElementById('calendarContainer');
+            calendarContainer.innerHTML = '';
+
+            const monthYearDisplay = document.getElementById('monthYear');
+            monthYearDisplay.textContent = `${monthNames[date.getMonth()]} ${date.getFullYear()}`;
+
+            let firstDay = new Date(date.getFullYear(), date.getMonth(), 1).getDay();
+            firstDay = (firstDay === 0) ? 6 : firstDay - 1; // Adjust to start from Monday (0 = Monday)
+
+            const daysInMonth = new Date(date.getFullYear(), date.getMonth() + 1, 0).getDate();
+
+            const weekdaysDiv = document.createElement('div');
+            weekdaysDiv.classList.add('weekdays');
+            ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'].forEach(day => {
+                const dayDiv = document.createElement('div');
+                dayDiv.textContent = day;
+                weekdaysDiv.appendChild(dayDiv);
+            });
+            calendarContainer.appendChild(weekdaysDiv);
+
+            const daysDiv = document.createElement('div');
+            daysDiv.classList.add('days');
+
+            for (let i = 0; i < firstDay; i++) {
+                const emptyDiv = document.createElement('div');
+                emptyDiv.classList.add('empty');
+                daysDiv.appendChild(emptyDiv);
+            }
+
+            for (let day = 1; day <= daysInMonth; day++) {
+                const dayDiv = document.createElement('div');
+                dayDiv.textContent = day;
+                dayDiv.onclick = () => {
+                    const formattedDate = `${date.getFullYear()}-${(date.getMonth() + 1).toString().padStart(2, '0')}-${day.toString().padStart(2, '0')}`;
+                    window.location.href = `/add_entry/${formattedDate}`;
+                };
+                daysDiv.appendChild(dayDiv);
+            }
+            calendarContainer.appendChild(daysDiv);
+        }
+
+        function changeYear(offset) {
+            currentDate.setFullYear(currentDate.getFullYear() + offset);
+            renderCalendar(currentDate);
+        }
+
+        function changeMonth(offset) {
+            currentDate.setMonth(currentDate.getMonth() + offset);
+            renderCalendar(currentDate);
+        }
+
+        renderCalendar(currentDate);
+
+        // Flask에서 전달된 팝업 메시지 처리
+        const popupMessage = "{{ popup_message | safe }}";
+        if (popupMessage) {
+            alert(popupMessage);
+        }
+    </script>
+</body>
+</html>

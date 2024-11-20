@@ -1,0 +1,307 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Step 1</title>
+
+    <style>
+        @font-face {
+            font-family: 'S-CoreDream-3Light';
+            src: url('https://fastly.jsdelivr.net/gh/projectnoonnu/noonfonts_six@1.2/S-CoreDream-3Light.woff') format('woff');
+            font-weight: normal;
+            font-style: normal;
+        }
+
+        body, html {
+            margin: 0;
+            padding: 0;
+            height: 100%;
+            font-family: 'S-CoreDream-3Light', Arial, sans-serif;
+            display: flex;
+            flex-direction: column;
+            width: 100%;
+            overflow-x: hidden;
+        }
+
+        .logo-container {
+            position: relative;
+            top: 10px;
+            left: 20px;
+            text-align: left;
+            z-index: 10;
+            margin-bottom: 30px;
+            margin-top: 25px;
+        }
+
+        .logo-container img {
+            width: 160px;
+            height: auto;
+            cursor: pointer;
+        }
+
+        .step-title {
+            width: 100%;
+            height: 33.3vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin-bottom: 50px;
+            margin-top: 10px;
+        }
+
+        .step-title img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .links-title {
+            text-align: center;
+            margin-bottom: 15px;
+            font-size: 20px;
+            font-weight: normal;
+        }
+
+        .links {
+            display: grid;
+            grid-template-columns: repeat(3, auto);
+            justify-content: center;
+            align-items: center;
+            row-gap: 10px;
+            column-gap: 20px;
+            margin: 0 auto;
+        }
+
+        .links a {
+            text-align: center;
+        }
+
+        .links img {
+            width: 120px;
+            height: auto;
+            cursor: pointer;
+            transition: transform 0.3s ease;
+        }
+
+        .links img:hover {
+            transform: scale(1.1);
+        }
+
+        .form-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            margin-top: 20px;
+        }
+
+        .form-container h3 {
+            font-size: 20px;
+            font-weight: normal;
+            text-align: center;
+            margin-bottom: 15px;
+        }
+
+        .form-row, .file-upload-row {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin-top: 10px;
+        }
+
+        select {
+            font-size: 14px;
+            padding: 8px;
+            width: 180px;
+        }
+
+        input[type="file"] {
+            font-size: 14px;
+            padding: 8px;
+        }
+
+        .button-container {
+            display: flex;
+            justify-content: center;
+            margin-top: 50px;
+            padding: 0 20px;
+            gap: 20px;
+        }
+
+        .button-container button {
+            margin-bottom: 80px;
+            background-color: #003366;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            font-size: 16px;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        .button-container button:hover {
+            background-color: #002953;
+        }
+
+        .section5 {
+            grid-row: 5;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            background-color: #424141;
+            color: rgb(185, 185, 185);
+            padding: 20px;
+            height: 22.2vh;
+        }
+
+        .section5 h5, .section5 h7, .section5 p {
+            margin: 10px 0;
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- 로고 영역 -->
+    <div class="logo-container">
+        <a href="{{ url_for('index') }}" id="logo-link">
+            <img src="/static/images/logo.jpg" alt="로고">
+        </a>
+    </div>
+
+    <!-- Step 1 이미지 삽입 부분 -->
+    <div class="step-title">
+        <img src="/static/images/second_page_cover.jpg" alt="2페이지 커버">
+    </div>
+
+    <!-- 은행 별 다운로드 링크 텍스트 -->
+    <div class="links-title">
+        은행 별 다운로드 링크
+    </div>
+
+    <!-- 은행 별 로고 링크 -->
+    <div class="links">
+        <a href="https://www.kbstar.com" target="_blank">
+            <img src="/static/images/KBLOGO.jpg" alt="국민은행 로고">
+        </a>
+        <a href="https://banking.nonghyup.com/nhbank.html" target="_blank">
+            <img src="/static/images/NHLOGO.jpg" alt="농협 로고">
+        </a>
+        <a href="https://www.wooribank.com" target="_blank">
+            <img src="/static/images/WOORILOGO.jpg" alt="우리은행 로고">
+        </a>
+        <a href="https://www.kakaobank.com" target="_blank">
+            <img src="/static/images/KAKAOLOGO.jpg" alt="카카오뱅크 로고">
+        </a>
+        <a href="https://www.kbanknow.com" target="_blank">
+            <img src="/static/images/KLOGO.jpg" alt="케이뱅크 로고">
+        </a>
+        <a href="https://www.tossbank.com" target="_blank">
+            <img src="/static/images/TOSSLOGO.jpg" alt="토스뱅크 로고">
+        </a>
+        <a href="https://www.kebhana.com" target="_blank">
+            <img src="/static/images/HANALOGO.jpg" alt="하나은행 로고">
+        </a>
+        <a href="https://www.kfcc.co.kr" target="_blank">
+            <img src="/static/images/MGLOGO.jpg" alt="MG새마을금고 로고">
+        </a>
+    </div>
+
+    <!-- 엑셀 파일 업로드 섹션 -->
+    <div class="form-container">
+        <h3>엑셀 파일 업로드</h3>
+        <form id="file-upload-form" enctype="multipart/form-data">
+            <div class="form-row">
+                <label for="bank_type">은행 타입:</label>
+                <select name="bank_type" id="bank_type" required>
+                    <option value="국민은행">국민은행</option>
+                    <option value="농협은행">농협은행</option>
+                    <option value="우리은행">우리은행</option>
+                    <option value="카카오뱅크">카카오뱅크</option>
+                    <option value="케이뱅크">케이뱅크</option>
+                    <option value="토스">토스</option>
+                    <option value="하나은행">하나은행</option>
+                    <option value="MG새마을금고">MG새마을금고</option>
+                </select>
+            </div>
+
+            <div class="file-upload-row">
+                <label for="file">거래 내역 파일 업로드 (.xls 또는 .xlsx):</label>
+                <input type="file" id="file" name="file" accept=".xls, .xlsx" required>
+            </div>
+        </form>
+    </div>
+
+    <!-- 네비게이션 버튼 -->
+    <div class="button-container">
+        <button id="prev-button" type="button">Prev</button>
+        <button id="next-button" type="button">Next</button>
+    </div>
+
+    <!-- 하단 정보 -->
+    <div class="section section5">
+        <h4>경희대학교 데이터 분석/AI 중앙동아리 KHUDA</h4>
+        <h7>Data Buisiness & Recommendation System Track</h7>
+        <p>개발: 소프트웨어융합학과 최소영, 이제희 / 산업경영공학과 허채은, 이준영</p>
+    </div>
+
+    <script>
+        // 로고 클릭 시 경고 창
+        document.getElementById('logo-link').addEventListener('click', function(event) {
+            const confirmation = confirm("메인 페이지로 돌아가시겠습니까?");
+            if (!confirmation) {
+                event.preventDefault();
+            }
+        });
+    
+        // 이전 버튼 클릭 시 확인
+        document.getElementById('prev-button').addEventListener('click', function(event) {
+            const confirmation = window.confirm("이전 페이지로 돌아가시겠습니까?");
+            if (confirmation) {
+                window.location.href = "{{ url_for('index') }}";  // index 페이지로 이동
+            } else {
+                event.preventDefault();  // 확인을 클릭하지 않으면 페이지 이동을 막음
+            }
+        });
+
+
+        // 'Next' 버튼 클릭 시 파일 업로드 후 third_page로 이동
+        document.getElementById('next-button').addEventListener('click', function(event) {
+            const fileInput = document.getElementById('file');
+            const form = document.getElementById('file-upload-form');
+
+            if (fileInput.files.length === 0) {
+                alert("파일을 선택해주세요.");
+                event.preventDefault();  // 페이지 이동을 막음
+                return;
+            }
+
+            // FormData 객체를 사용하여 비동기적으로 파일을 서버로 전송
+            const formData = new FormData(form);
+
+            fetch('{{ url_for("second_page") }}', {
+                method: 'POST',
+                body: formData
+            })
+            .then(response => response.json())  // 응답을 JSON 형식으로 받음
+            .then(data => {
+                // 파일 업로드가 성공적으로 처리된 후
+                if (data.message === 'File uploaded and processed successfully') {
+                    // 업로드 성공 팝업 띄우기
+                    alert("파일이 성공적으로 업로드되었습니다.");
+                    
+                    // 팝업 메시지가 닫힌 후에 third_page로 리디렉션
+                    window.location.href = data.redirect_url;  // third_page로 리디렉션
+                } else {
+                    alert(data.error || "파일 업로드에 실패했습니다. 다시 시도해 주세요.");
+                }
+            })
+            .catch(error => {
+                alert("서버와의 통신에 문제가 발생했습니다.");
+                console.error("Error:", error);
+            });
+        });
+    </script>
+</body>
+</html>

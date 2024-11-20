@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>전체 월별 소비량 변화</title>
+    <style>
+        body {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            font-family: Arial, sans-serif;
+        }
+        .chart-container {
+            margin-top: 20px;
+        }
+        .chart-container img {
+            max-width: 90%;
+            height: auto;
+            margin-bottom: 20px;
+        }
+        .back-button {
+            margin-top: 20px;
+            padding: 10px 20px;
+            background-color: #007BFF;
+            color: white;
+            border: none;
+            cursor: pointer;
+            text-decoration: none;
+        }
+        .back-button:hover {
+            background-color: #0056b3;
+        }
+    </style>
+</head>
+<body>
+    <h1>전체 월별 소비량 변화</h1>
+    <div class="chart-container">
+        {% if img_path %}
+            <img src="{{ img_path }}" alt="전체 월별 소비량 변화 선 그래프">
+        {% else %}
+            <p>데이터가 없습니다.</p>
+        {% endif %}
+    </div>
+    <a href="/past_page" class="back-button">돌아가기</a>
+</body>
+</html>
