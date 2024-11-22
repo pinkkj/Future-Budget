@@ -1,11 +1,8 @@
 import pandas as pd
 import numpy as np
-from category_mapping import apply_category_mapping
 
 # 카테고리별 비율
 def prepare_data(data):
-    data = apply_category_mapping(data)
- 
     category_counts = data['카테고리'].value_counts(normalize=True) * 100
     original_ratios = category_counts.to_dict()
 
@@ -17,7 +14,7 @@ def prepare_data(data):
     df = pd.DataFrame({'카테고리': categories, '원래 비율': list(filtered_ratios.values()), '가중치': weights})
     return df, original_ratios, exclude_categories
 
-# '간편 결제', '이체', '기타'를 제외한 카테고리별 비율
+# '간편 결제', '이체', '기타'를 제외한 카테고리별 비율(빈도수)
 def redistribute_excluded_categories(df, original_ratios, exclude_categories):
     excluded_total_ratio = sum(original_ratios.get(cat, 0) for cat in exclude_categories)
     top_3_indices = df.nlargest(3, '원래 비율').index

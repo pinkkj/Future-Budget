@@ -65,11 +65,9 @@ def second_preprocessing(data):
     }
 
     def get_chatgpt_response(query):
-        completion = client.chat.completions.create(
-      messages=[
-          {"role": "user", "content": f"{query}에 대한 기본 정보를 알려주세요."}
-        ],
-        model="gpt-3.5-turbo",
+        completion = openai.ChatCompletion.create(
+            messages=[{"role": "user", "content": query}],
+            model="gpt-3.5-turbo",
         )
         return completion.choices[0].message.content.strip()
 

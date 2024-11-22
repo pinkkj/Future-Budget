@@ -12,7 +12,9 @@ from datetime import datetime
 # 사용자 정의 함수
 from file import allowed_file
 from bank_pre import preprocess
-from visualization import monthly_consumption, monthly_trend
+from visualization import monthly_consumption, monthly_trend, plot_monthly_budget_and_expenses
+from category_ratio import prepare_data, redistribute_excluded_categories
+from budget_distribution import calc_original_ratios, adjust_weights_with_normalization_calculate_budget,redistribute_ratios
 
 # 설치된 한글 폰트 경로 설정 (예: 맑은 고딕)
 font_path = 'SCDream2.otf'  # Windows
@@ -375,6 +377,7 @@ def future_budget_visualization():
     current_month = datetime.now().month
     current_year = datetime.now().year
     file_path = f"./uploads/{client_id}_bank.xlsx"
+    current_month_str = f"{current_year}-{current_month:02d}"
 
     if not os.path.exists(file_path):
         return "No data file available."
@@ -385,156 +388,41 @@ def future_budget_visualization():
     df = df.dropna(subset=['거래일시'])
     df['출금액'] = pd.to_numeric(df['출금액'], errors='coerce').fillna(0)
     df['월'] = df['거래일시'].dt.to_period('M')
+    monthly_expense_data = df.copy()
 
-    # 카테고리별 비율 계산
-    monthly_expense_data = df.groupby(['월', '카테고리'])['출금액'].sum().unstack(fill_value=0)
+    
+    # 지난달들을 기준으로 비율 계산
+    df = df[df['월'] != current_month_str]
+    df, original_ratios, exclude_categories, filtered_ratios = calc_original_ratios(df)
+    df = redistribute_ratios(df, original_ratios, exclude_categories)
+    budget_distribution, df = adjust_weights_with_normalization_calculate_budget(df,filtered_ratios,category_dict[client_id], float(money_dict[client_id]['예산']))
+
+    # 현재 월 데이터 추출 및 카테고리 정보 추가
+    # 기존 데이터프레임 처리
+    monthly_expense_data = monthly_expense_data.groupby(['월', '카테고리'])['출금액'].sum().unstack(fill_value=0)
     monthly_expense_data = monthly_expense_data.reset_index()
     monthly_expense_data['월'] = monthly_expense_data['월'].astype(str)
 
-    # 모든 데이터 문자열로 변환 후 숫자형으로 변환 시도
-    for col in monthly_expense_data.columns[1:]:
-        monthly_expense_data[col] = monthly_expense_data[col].apply(lambda x: pd.to_numeric(str(x).replace(',', ''), errors='coerce'))
-    output_filename = f"monthly_expense_data.xlsx"
-    output_path = os.path.join(app.config['UPLOAD_FOLDER'], output_filename)
-    monthly_expense_data.to_excel(output_path, index=False)
-    # 숫자형 컬럼만 선택하여 합계 계산
-    category_total_sum = monthly_expense_data.iloc[:, 1:].sum()
-    # 비율 계산
-    category_ratios = (category_total_sum / category_total_sum.sum()) * 100
-    original_ratios = category_ratios.to_dict()
-
-    # 현재 월 데이터 추출 및 카테고리 정보 추가
+    # original_ratios의 카테고리 순서대로 재정렬
+    ordered_columns = ['월'] + list(original_ratios.keys())
+    monthly_expense_data = monthly_expense_data.reindex(columns=ordered_columns, fill_value=0)
     if f"{current_year}-{current_month:02d}" in monthly_expense_data['월'].values:
-        current_month_data = monthly_expense_data[monthly_expense_data['월'] == f"{current_year}-{current_month:02d}"].drop(columns=['월']).melt(var_name='카테고리', value_name='지출액')
+        current_month_row = monthly_expense_data[monthly_expense_data['월'] == f"{current_year}-{current_month:02d}"].iloc[0]
+
+    # original_ratios에 값이 있으면 넣고, 없으면 0으로 초기화
+        current_month_data = pd.DataFrame({
+            '카테고리': list(original_ratios.keys()),
+            '지출액': [current_month_row.get(cat, 0) for cat in original_ratios.keys()]
+        })
     else:
-        current_month_data = pd.DataFrame(columns=['카테고리', '지출액'])
-
-    # current_month_data 파일로 저장
-    output_filename = f"current_month_data.xlsx"
-    output_path = os.path.join(app.config['UPLOAD_FOLDER'], output_filename)
-    current_month_data.to_excel(output_path, index=False)
-    # 카테고리별 지출 비율 계산
-    # 현재 연도와 월
-    current_month_str = f"{current_year}-{current_month:02d}"
-
-    # 현재 달을 제외한 데이터프레임 생성
-    filtered_expense_data = monthly_expense_data[monthly_expense_data['월'] != current_month_str]
-
-    # 월 열을 제외하고 나머지 열을 모두 숫자형으로 변환
-    filtered_expense_data.iloc[:, 1:] = filtered_expense_data.iloc[:, 1:].apply(pd.to_numeric, errors='coerce').fillna(0)
-    # 숫자형 열만 선택하여 합계 계산
-    category_total_sum = filtered_expense_data.drop(columns=['월']).select_dtypes(include=[np.number]).sum()
-
-    category_ratios = (category_total_sum / category_total_sum.sum()) * 100
-    original_ratios = category_ratios.to_dict()
-
-    # 가중치 조정
-    exclude_categories = ["간편 결제", "이체", "기타"]
-    filtered_ratios = {k: v for k, v in original_ratios.items() if k not in exclude_categories}
-    print("\nflitered_ratios",filtered_ratios)
-    categories = list(filtered_ratios.keys())
-    # ['식비','카페',,,,]
-    weights = [1.0] * len(categories)
-    df_ratios = pd.DataFrame({'카테고리': categories, '원래 비율': list(filtered_ratios.values()), '가중치': weights})
-    excluded_total_ratio = sum(
-    original_ratios.get(cat, 0) for cat in exclude_categories if original_ratios.get(cat, 0) is not None
-    )
-    top_3_indices = df_ratios.nlargest(5, '원래 비율').index
-    df_ratios.loc[top_3_indices, '원래 비율'] += excluded_total_ratio / 5
-
-    # 선택된 카테고리 가져오기
-    selected_categories = [categories.index(cat) for cat in category_dict[client_id] if cat in categories]
-    print(selected_categories)
-    # [11] -> 편의점이라 11
-
-    def adjust_weights_with_normalization():
-        decrease_factor = 0.7
-        for idx in selected_categories:
-            df_ratios.at[idx, '가중치'] *= decrease_factor
-
-        df_ratios['조정된 비율'] = df_ratios['원래 비율'] * df_ratios['가중치']
-        total_adjusted_ratio = df_ratios['조정된 비율'].sum()
-        df_ratios['최종 비율'] = (df_ratios['조정된 비율'] / total_adjusted_ratio) * 100
-
-    adjust_weights_with_normalization()
-
-    budget = float(money_dict[client_id]['예산'])
-    budget_distribution = (df_ratios['최종 비율'] / 100 * budget).to_dict()
+    # original_ratios에 기반한 빈 데이터프레임 생성
+        current_month_data = pd.DataFrame({
+            '카테고리': list(original_ratios.keys()),
+            '지출액': [0] * len(original_ratios)
+        })
 
 
-    def plot_monthly_budget_and_expenses():
-        monthly_expense = current_month_data.to_dict()
-
-        # 제외된 카테고리 제거
-        filtered_categories = {idx: cat for idx, cat in monthly_expense['카테고리'].items() if cat not in exclude_categories}
-        filtered_expenses = {idx: expense for idx, expense in monthly_expense['지출액'].items() if idx in filtered_categories}
-
-        # filtered_expense 딕셔너리 생성
-        filtered_expense = {
-            '카테고리': filtered_categories,
-            '지출액': filtered_expenses
-        }
-
-        # 인덱스를 0부터 다시 할당
-        monthly_expense = {
-            '카테고리': {new_idx: cat for new_idx, (old_idx, cat) in enumerate(filtered_expense['카테고리'].items())},
-            '지출액': {new_idx: filtered_expense['지출액'][old_idx] for new_idx, old_idx in enumerate(filtered_expense['지출액'].keys())}
-        }
-        categories_name = list(monthly_expense['카테고리'].values())
-        categories = list(budget_distribution.keys())
-        print(categories)
-        print('\n예산 확인: ',budget_distribution)
-        expense_values = [monthly_expense['지출액'].get(cat, 0) for cat in categories]
-        budget_values = [budget_distribution[cat] for cat in categories]
-        print("\n카테고리확인지출: ",monthly_expense)
-        remaining_budget = [budget_distribution[cat] - monthly_expense['지출액'].get(cat, 0) for cat in categories]
-        print(categories_name)
-
-        fig, ax = plt.subplots(figsize=(15, 10))
-        bars_expense = ax.bar(categories, expense_values, color='darkblue', label='지출')
-        bars_remaining = ax.bar(categories, remaining_budget, color='lightblue', alpha=0.7, label='남은 예산', bottom=expense_values)
-
-        font_path = 'SCDream2.otf'
-        fontprop = fm.FontProperties(fname=font_path)
-        ax.set_ylabel('금액 (원)', fontproperties=fontprop)
-        ax.set_xlabel('카테고리', fontproperties=fontprop)
-        ax.set_title(f'{current_year}-{current_month:02d} 월별 카테고리별 지출 및 남은 예산', fontproperties=fontprop)
-        ax.legend(prop=fontprop)
-        ax.margins(x=0.01)
-        ax.set_xticks(range(len(categories_name)))  # x축 틱의 개수를 카테고리 수에 맞춤
-        ax.set_xticklabels(categories_name, fontproperties=fontprop)
-
-        # 각 바에 지출, 예산, 남은 돈을 한 박스에 표시
-        for i in range(len(categories)):
-            expense = expense_values[i]
-            budget = budget_values[i]
-            remaining = remaining_budget[i]
-            text_position = budget + expense if budget + expense < max(budget, expense) else max(budget, expense)
-        
-            # 텍스트 박스 내용 생성
-            text = f'예산: {budget:,.0f}원\n지출: {expense:,.0f}원\n남은 돈: {remaining:,.0f}원'
-            print(text_position)
-            #height_offset = 200 if text_position == budget+expense else 10
-            height_offset = 10
-            # 박스에 텍스트 추가
-            ax.annotate(
-                text,
-                (i, text_position),
-                textcoords="offset points",
-                xytext=(0, height_offset),
-                ha='center',
-                bbox=dict(boxstyle="round,pad=0.3", edgecolor='black', facecolor='white'),
-                fontproperties=fontprop,
-                fontsize=8
-            )
-
-        plt.tight_layout(pad=2.0)
-        img_path = f'static/{client_id}_monthly_budget.png'
-        plt.savefig(img_path)
-        plt.close()
-        return img_path
-
-    img_path = plot_monthly_budget_and_expenses()
+    img_path = plot_monthly_budget_and_expenses(current_month_data,budget_distribution,exclude_categories, font_path, client_id)
     return render_template('future_budget_visualization.html', img_path=img_path)
 
 
