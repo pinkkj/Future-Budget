@@ -1,0 +1,271 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>과거 페이지</title>
+    <style>
+        /* 기본 스타일 추가 */
+        @font-face {
+            font-family: 'S-CoreDream-3Light';
+            src: url('https://fastly.jsdelivr.net/gh/projectnoonnu/noonfonts_six@1.2/S-CoreDream-3Light.woff') format('woff');
+            font-weight: normal;
+            font-style: normal;
+        }
+
+        body, html {
+            margin: 0;
+            padding: 0;
+            height: 100%;
+            font-family: 'S-CoreDream-3Light', Arial, sans-serif;
+            display: flex;
+            flex-direction: column;
+            width: 100%;
+            overflow-x: hidden; /* 가로 스크롤을 숨깁니다 */
+            background-color: #ffffff; /* 배경 색상 */
+        }
+
+        /* 로고 스타일 */
+        .logo-container {
+            position: relative;
+            top: 10px;
+            left: 20px;
+            text-align: left;
+            z-index: 10;
+            margin-bottom: 30px;
+            margin-top: 25px;
+        }
+
+        .logo-container img {
+            width: 160px;
+            height: auto;
+            cursor: pointer;
+        }
+
+
+        /* 달력 스타일 */
+        .calendar {
+            margin-top: 50px;
+            width: 80%; /* 달력의 크기를 넓혀줍니다 */
+            margin: 0 auto; /* 중앙 정렬 */
+        }
+        .calendar-header {
+            display: flex;
+            justify-content: space-between;
+            width: 100%;
+            margin-bottom: 20px;
+            margin-top: 80px;
+        }
+        .calendar-header h2 {
+            cursor: pointer;
+            font-size: 24px; /* 헤더 텍스트 크기 증가 */
+        }
+        .week-row {
+            display: flex;
+            justify-content: center; /* 주간 셀들을 중앙 정렬 */
+        }
+        .day {
+            display: inline-block;
+            width: 60px; /* 날짜 셀의 너비 증가 */
+            height: 60px; /* 날짜 셀의 높이 증가 */
+            margin: 5px;
+            text-align: center;
+            line-height: 60px; /* 텍스트 수직 중앙 정렬 */
+            cursor: pointer;
+            border: 1px solid #ccc;
+            font-size: 20px; /* 날짜 텍스트 크기 증가 */
+        }
+        .day:hover {
+            background-color: #f0f0f0;
+        }
+        .empty {
+            visibility: hidden;
+        }
+
+        /* 월별 소비 동향 보러가기 버튼 스타일 */
+        .view-trends-button {
+            margin-top: 30px;
+            padding: 8px 15px; /* 버튼 크기 줄임 */
+            background-color: #003366;
+            color: white;
+            border: none;
+            cursor: pointer;
+            font-size: 16px; /* 텍스트 크기 줄임 */
+            text-align: center;
+        }
+        .view-trends-button:hover {
+            background-color: #002953;
+        }
+
+        /* 버튼을 중앙에 배치하기 위한 스타일 */
+        .button-container {
+            display: flex;
+            justify-content: center; /* 수평 중앙 정렬 */
+            align-items: center; /* 수직 중앙 정렬 */
+            margin-top: 30px;
+        }
+
+        .section5 {
+            grid-row: 5;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            background-color: #424141;
+            color: rgb(185, 185, 185);
+            padding: 20px;
+            height: 22.2vh;
+            margin-top: 130px;
+        }
+
+        .section5 h5, .section5 h7, .section5 p {
+            margin: 10px 0;
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- 로고 영역 -->
+    <div class="logo-container">
+        <a href="/" id="logo-link">
+            <img src="/static/images/logo.jpg" alt="로고">
+        </a>
+    </div>
+
+    <!-- 과거 페이지 타이틀 -->
+
+    <!-- 콘텐츠 영역 -->
+    <div class="content">
+        <!-- 달력 영역 -->
+        <div class="calendar">
+            <div class="calendar-header">
+                <button id="prevBtn" onclick="prevMonth()">&lt;</button>
+                <h2 id="monthYear" onclick="goToMonthlyExpenditure()"></h2>
+                <button id="nextBtn" onclick="nextMonth()">&gt;</button>
+            </div>
+            <div id="calendarDays"></div>
+        </div>
+
+        <!-- 월별 소비 동향 보러가기 버튼을 감싸는 div (중앙 정렬) -->
+        <div class="button-container">
+            <button class="view-trends-button" onclick="goToMonthlyTrend()">월별 소비 동향 확인</button>
+        </div>
+    </div>
+
+    <!-- 하단 회색 영역 추가 -->
+    <div class="section section5">
+        <h4>경희대학교 데이터 분석/AI 중앙동아리 KHUDA</h4>
+        <h7>Data Business & Recommendation System Track</h7>
+        <p>개발: 소프트웨어융합학과 최소영, 이제희 / 산업경영공학과 허채은, 이준영</p>
+    </div>
+
+    <script>
+        // 로고 클릭 시 확인 팝업
+        document.getElementById('logo-link').addEventListener('click', function(event) {
+            const confirmation = confirm("메인 페이지로 돌아가시겠습니까?");
+            if (!confirmation) {
+                event.preventDefault(); // 취소 시 이동을 막음
+            }
+        });
+
+        const calendarDays = document.getElementById('calendarDays');
+        const monthYear = document.getElementById('monthYear');
+        const prevBtn = document.getElementById('prevBtn');
+        const nextBtn = document.getElementById('nextBtn');
+        let currentDate = new Date();
+
+        // 서버에서 전달된 데이터를 JSON 형식으로 올바르게 파싱
+        const yearMonths = JSON.parse('{{ year_months|tojson }}');
+        let filteredMonths = yearMonths.map(period => new Date(period));
+
+        function getWeekDateRange(date) {
+            const targetDate = new Date(date);
+            const day = targetDate.getDay();
+
+            const startDate = new Date(targetDate);
+            startDate.setDate(targetDate.getDate() - day);
+
+            const endDate = new Date(startDate);
+            endDate.setDate(startDate.getDate() + 6);
+            return { start: startDate, end: endDate };
+        }
+
+        function renderCalendar() {
+            calendarDays.innerHTML = '';
+            monthYear.textContent = `${currentDate.getFullYear()}.${(currentDate.getMonth() + 1).toString().padStart(2, '0')}`;
+
+            // 현재 날짜를 기준으로 다음 달로 넘어가지 못하게 하는 로직
+            const currentMonth = currentDate.getMonth();
+            const currentYear = currentDate.getFullYear();
+            const today = new Date();
+
+            // 'next' 버튼을 비활성화하는 조건 추가 (오늘 날짜 이후로 넘어가지 못하게)
+            nextBtn.disabled = (currentYear === today.getFullYear() && currentMonth === today.getMonth()) || (currentYear > today.getFullYear());
+
+            const firstDay = new Date(currentDate.getFullYear(), currentDate.getMonth(), 1).getDay();
+            const daysInMonth = new Date(currentDate.getFullYear(), currentDate.getMonth() + 1, 0).getDate();
+            let weekRow = document.createElement('div');
+            weekRow.className = 'week-row';
+
+            // 날짜 셀을 비워서 시작
+            for (let i = 0; i < firstDay; i++) {
+                const emptyCell = document.createElement('div');
+                emptyCell.className = 'day empty';
+                weekRow.appendChild(emptyCell);
+            }
+
+            for (let day = 1; day <= daysInMonth; day++) {
+                const dayCell = document.createElement('div');
+                dayCell.textContent = day;
+                dayCell.className = 'day';
+
+                const selectedDate = new Date(currentDate.getFullYear(), currentDate.getMonth(), day);
+
+                // 날짜가 포함된 주를 찾기
+                const { start, end } = getWeekDateRange(selectedDate);
+
+                // 모든 날짜를 클릭 가능하도록 설정
+                dayCell.onclick = () => {
+                    window.location.href = `/weekly_expenditure/${start.toISOString().split('T')[0]}/${end.toISOString().split('T')[0]}`;
+                };
+
+                weekRow.appendChild(dayCell);
+
+                if (weekRow.children.length === 7) {
+                    calendarDays.appendChild(weekRow);
+                    weekRow = document.createElement('div');
+                    weekRow.className = 'week-row';
+                }
+            }
+
+            if (weekRow.children.length > 0) {
+                calendarDays.appendChild(weekRow);
+            }
+        }
+
+
+        // 연월 클릭 시, 해당 월의 소비 동향 페이지로 이동하는 함수
+        function goToMonthlyExpenditure() {
+            const monthYearString = `${currentDate.getFullYear()}-${(currentDate.getMonth() + 1).toString().padStart(2, '0')}`;
+            window.location.href = `/monthly_expenditure/${monthYearString}`;
+        }
+        
+        function goToMonthlyTrend() {
+            window.location.href = `/monthly_trend`;
+        }
+
+        function prevMonth() {
+            currentDate.setMonth(currentDate.getMonth() - 1);
+            renderCalendar();
+        }
+
+        function nextMonth() {
+            currentDate.setMonth(currentDate.getMonth() + 1);
+            renderCalendar();
+        }
+
+        renderCalendar();
+    </script>
+</body>
+</html>

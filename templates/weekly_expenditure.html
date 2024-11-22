@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Weekly Expenditure</title>
+    <style>
+        @font-face {
+            font-family: 'S-CoreDream-3Light';
+            src: url('https://fastly.jsdelivr.net/gh/projectnoonnu/noonfonts_six@1.2/S-CoreDream-3Light.woff') format('woff');
+            font-weight: normal;
+            font-style: normal;
+        }
+        body, html {
+            margin: 0;
+            padding: 0;
+            height: 100%;
+            font-family: 'S-CoreDream-3Light', Arial, sans-serif;
+            display: flex;
+            flex-direction: column;
+            width: 100%;
+            overflow-x: hidden; /* 가로 스크롤을 숨깁니다 */
+        }
+    </style>
+    
+</head>
+<body>
+    <h1>주별 지출 비율</h1>
+    {% if img_path %}
+        <img src="{{ img_path }}" alt="Weekly Expenditure Chart">
+    {% else %}
+        <p>No data available for the selected week.</p>
+    {% endif %}
+</body>
+</html>
